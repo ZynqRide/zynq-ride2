@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: zynq-ride-backend
+    env: node
+    plan: free
+    branch: main
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: MONGODB_URI
+        fromEnvironment: MONGODB_URI
+      - key: JWT_SECRET
+        fromEnvironment: JWT_SECRET
+      - key: PORT
+        fromEnvironment: PORT
+      - key: FRONTEND_ORIGIN
+        fromEnvironment: FRONTEND_ORIGIN
