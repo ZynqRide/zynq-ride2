@@ -15,16 +15,32 @@ const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || null;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'https://your-netlify-app.netlify.app';
 
+const allowedOrigins = [
+  FRONTEND_ORIGIN,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000',
+];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // allow mobile browsers or no-origin clients
+  if (allowedOrigins.includes(origin)) return true;
+  if (/^https?:\/\/(.+\.)?netlify\.(app|com)$/i.test(origin)) return true;
+  if (/^https?:\/\/(.+\.)?vercel\.(app|com)$/i.test(origin)) return true;
+  return false;
+}
+
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow curl/postman
-    const allowed = [FRONTEND_ORIGIN];
-    if (process.env.NODE_ENV !== 'production') {
-      allowed.push('http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000');
-    }
-    if (allowed.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
     return callback(new Error('CORS policy: This origin is not allowed: ' + origin));
   },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
