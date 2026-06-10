@@ -1,0 +1,44 @@
+# Netlify configuration for ZYNQ Ride frontend
+# - SPA fallback to /index.html
+# - Proxy /api/* requests to the backend service
+# - Recommended security headers and caching rules
+
+[build]
+  # If you have a frontend build step, set `command` and `publish` appropriately.
+  # Example: command = "npm run build" and publish = "dist"
+  publish = "."
+
+[[redirects]]
+  # Proxy API requests to the backend (adjust URL if different)
+  from = "/api/*"
+  to = "https://zynq-ride-backend.onrender.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # SPA single-page fallback — serve index.html for all non-matched routes
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  # Security headers for all responses
+  for = "/*"
+  [headers]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    X-XSS-Protection = "1; mode=block"
+
+[[headers]]
+  # Long cache for static assets (update paths to match your build output)
+  for = "/static/*"
+  [headers]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Don't cache HTML pages
+  for = "/*.html"
+  [headers]
+    Cache-Control = "no-cache, no-store, must-revalidate"
